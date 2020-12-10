@@ -1,12 +1,6 @@
 <template>
   <section id="wrap">
-    <audio
-      @pause="audioPause"
-      @play="audioPlay"
-      class="audio"
-      ref="audio"
-      src="http://www.qigexiaoairen.cn:3001/public/旧城之王.mp3"
-    ></audio>
+    <audio @pause="audioPause" @play="audioPlay" class="audio" ref="audio" :src="nowSong.url"></audio>
     <div class="loop" @click.stop="changeLoop">
       <span class="iconfont" :class="loopCheck"></span>
     </div>
@@ -62,13 +56,24 @@ export default {
     }
   },
   mounted() {
+    // 当播放时间改变时通知vuex / 频率300ms每次
     this.audioTimeEvent()
+    // 添加全局window事件,当点击到window时让音量控制隐藏
     this.volumeWindowEvent()
+    // 元数据加载完后切歌
+    this.cutMySong()
   },
   watch: {
     cneedToChange(val) {
       this.$refs.audio.currentTime = val
     },
+    // isPause(val) {
+    //   if (!this.isPause) {
+    //     this.$refs.audio.pause()
+    //   } else {
+    //     this.$refs.audio.play()
+    //   }
+    // },
   },
   methods: {
     changeLoop() {
@@ -124,6 +129,15 @@ export default {
     shutVolume() {
       this.$refs.audio.muted = !this.$refs.audio.muted
       this[CHANGE_MUTED](this.$refs.audio.muted)
+    },
+    // 元数据加载后切歌
+    cutMySong() {
+      let that = this
+      this.$refs.audio.addEventListener('canplay', function() {
+        console.log('canplay')
+        this.play()
+        that[BOOL_PAUSE](true)
+      })
     },
   },
 }

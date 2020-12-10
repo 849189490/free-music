@@ -8,3 +8,5 @@ export const CHANGE_DURATION_TIME = 'changeDurationTime'
 export const CHANGE_MUTED = 'changeMuted'
 
 // actions
+export const ASYNC_SEARCH_SONGS = 'asyncSearchSongs'
+export const ASYNC_NOW_SONG = 'asyncNowSong'

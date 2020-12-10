@@ -25,27 +25,22 @@
       <span class="head-time">时长</span>
     </div>
     <ul class="search-list">
-      <li class="list-item">
-        <div class="head-song">
-          <span class="iconfont icon-collect"></span>
-          <span class="icon-name">旧城之王(live)</span>
+      <li v-for="item of songsList" :key="item.id" class="list-item">
+        <div class="head-song" @click.stop="headSongClick">
+          <div class="head-song-left">
+            <span class="iconfont icon-collect"></span>
+            <span class="icon-name">{{ item.name || item.artists.name }}</span>
+          </div>
+          <div class="head-song-right">
+            <span :data-id="item.id" class="iconfont icon-play"></span>
+            <span class="iconfont icon-add"></span>
+            <span class="iconfont icon-dowmload"></span>
+            <span class="iconfont icon-more"></span>
+          </div>
         </div>
-        <div class="head-person">
-          木马
-        </div>
-        <div class="head-collect">乐队</div>
-        <div class="head-time">05:18</div>
-      </li>
-      <li class="list-item">
-        <div class="head-song">
-          <span class="iconfont icon-collect"></span>
-          <span class="icon-name">旧城之王(live)</span>
-        </div>
-        <div class="head-person">
-          木马
-        </div>
-        <div class="head-collect">乐队</div>
-        <div class="head-time">05:18</div>
+        <div class="head-person" v-html="fullArtists(item.artists)"></div>
+        <div class="head-collect">{{ item.album.name }}</div>
+        <div class="head-time">{{ item.duration | timeFilter }}</div>
       </li>
     </ul>
   </section>
@@ -53,6 +48,17 @@
 
 <script>
 import NavBar from 'components/common/navbar/NavBar'
+import { mixCtrlStore } from 'common/mixin'
+import {
+  CHANGE_LIST_CHECKED,
+  CHANGE_LOOP_INDEX,
+  CHANG_EPAUSE,
+  BOOL_PAUSE,
+  CHANGE_CURRENT_TIME,
+  CHANGE_DURATION_TIME,
+  CHANGE_MUTED,
+  ASYNC_NOW_SONG,
+} from 'store/consts'
 export default {
   name: 'Songs',
   data() {
@@ -60,8 +66,45 @@ export default {
       list: ['歌曲', '视频', '专辑', '歌单', '歌词', '歌手', '用户'],
     }
   },
+  mixins: [mixCtrlStore],
   components: {
     NavBar,
+  },
+  computed: {
+    // 歌名 name artists.name
+    // 歌手 artists[0].name 遍历 artists
+    // 是否有mv artists.mvid 0无, 1有
+    // 专辑 album.name
+    // 编号 id
+    // 时长 duration
+  },
+  filters: {
+    timeFilter(val) {
+      val /= 1000
+      let second = parseInt(val % 60)
+      second = second > 9 ? second : '0' + second
+      let minute = parseInt(val / 60)
+      minute = minute > 9 ? minute : '0' + minute
+      return minute + ' : ' + second
+    },
+  },
+  methods: {
+    headSongClick(e) {
+      if (e.target.dataset.id) {
+        // 发送请求,开始放歌
+        this[ASYNC_NOW_SONG](e.target.dataset.id).then(() => {
+          this[BOOL_PAUSE](true)
+          this[CHANGE_CURRENT_TIME](0)
+        })
+      }
+    },
+    fullArtists(val) {
+      return val
+        .reduce((pre, cur) => {
+          return `${pre}<span data-id="${cur.id}">${cur.name}</span> / `
+        }, '')
+        .slice(0, -2)
+    },
   },
 }
 </script>
@@ -112,21 +155,27 @@ export default {
   }
   .list-head,
   .list-item {
-    //  360px 130px 180px 160px
     display: flex;
     justify-content: space-between;
     padding-left: 36px;
+    overflow: hidden;
+    white-space: nowrap;
     span {
       font-size: 12px;
       line-height: 36px;
     }
     .head-song {
+      overflow: hidden;
+      display: flex;
+      justify-content: space-between;
       width: 360px;
     }
     .head-person {
+      overflow: hidden;
       width: 130px;
     }
     .head-collect {
+      overflow: hidden;
       width: 180px;
     }
     .head-time {
@@ -139,7 +188,27 @@ export default {
     line-height: 52px;
     color: #000;
     li {
+      &:hover .head-song > .head-song-right {
+        display: flex;
+      }
+      div {
+        flex-grow: 0;
+      }
       .head-song {
+        .head-song-left {
+          width: 200px;
+        }
+        .head-song-right {
+          display: none;
+          align-items: center;
+          justify-content: flex-end;
+          width: 160px;
+          span {
+            padding: 0 3px;
+            color: #878787;
+            font-size: 14px;
+          }
+        }
         span {
           font-size: 14px;
         }
