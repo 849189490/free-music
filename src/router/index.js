@@ -4,12 +4,17 @@ import Shop from 'views/shop/Shop'
 
 const List = () => import('views/list/List')
 const Detail = () => import('views/detail/Detail')
+const Songs = () => import('views/songs/Songs')
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
+    redirect: '/songs',
+  },
+  {
+    path: '/shop',
     name: 'Shop',
     component: Shop,
   },
@@ -22,6 +27,11 @@ const routes = [
     path: '/detail',
     name: 'Detail',
     component: Detail,
+  },
+  {
+    path: '/songs',
+    name: 'Songs',
+    component: Songs,
   },
 ]
 

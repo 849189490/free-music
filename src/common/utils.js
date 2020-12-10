@@ -27,9 +27,11 @@ export function throttle(fn, interval) {
 // 获取元素到window的距离
 export function getRootOffset(ele) {
   let x = 0
+  let y = 0
   while (ele) {
     x += ele.offsetLeft
+    y += ele.offsetTop
     ele = ele.offsetParent
   }
-  return x
+  return { x, y }
 }

@@ -3,7 +3,6 @@
     <audio
       @pause="audioPause"
       @play="audioPlay"
-      controls
       class="audio"
       ref="audio"
       src="http://www.qigexiaoairen.cn:3001/public/旧城之王.mp3"
@@ -21,18 +20,37 @@
     <div class="next">
       <span class="iconfont icon-next"></span>
     </div>
-    <div class="voice" @click="voiceCtrl">
-      <span class="iconfont icon-voice"></span>
+    <div class="voice">
+      <span :class="{ 'img-gray': muted }" class="iconfont icon-voice" @click.stop="voiceCtrl"></span>
+      <div class="volume" ref="volume">
+        <div class="volume-base">
+          <div class="base-scroll"></div>
+          <div class="base-circle"></div>
+        </div>
+        <div class="volume-level">34%</div>
+        <div @click.stop="shutVolume" class="volume-img">
+          <span :class="{ 'img-gray': muted }" class="iconfont icon-voice"></span>
+        </div>
+      </div>
     </div>
   </section>
 </template>
 
 <script>
 import { throttle } from 'common/utils'
-import { CHANGE_LOOP_INDEX, CHANG_EPAUSE, BOOL_PAUSE, CHANGE_CURRENT_TIME, CHANGE_DURATION_TIME } from 'store/consts.js'
-import { mapState, mapMutations } from 'vuex'
+import { mixCtrlStore } from 'common/mixin'
+import {
+  CHANGE_LIST_CHECKED,
+  CHANGE_LOOP_INDEX,
+  CHANG_EPAUSE,
+  BOOL_PAUSE,
+  CHANGE_CURRENT_TIME,
+  CHANGE_DURATION_TIME,
+  CHANGE_MUTED,
+} from 'store/consts'
 export default {
   name: 'MusicCtrlItem',
+  mixins: [mixCtrlStore],
   props: {
     cneedToChange: 0, // 当此属性发生改变时意味着播放进度需要更新
   },
@@ -45,9 +63,7 @@ export default {
   },
   mounted() {
     this.audioTimeEvent()
-  },
-  computed: {
-    ...mapState(['loopIndex', 'isPause', 'currentTime', 'duration']),
+    this.volumeWindowEvent()
   },
   watch: {
     cneedToChange(val) {
@@ -55,7 +71,6 @@ export default {
     },
   },
   methods: {
-    ...mapMutations([CHANGE_LOOP_INDEX, CHANG_EPAUSE, BOOL_PAUSE, CHANGE_CURRENT_TIME, CHANGE_DURATION_TIME]),
     changeLoop() {
       this[CHANGE_LOOP_INDEX]()
       this.loopCheck = this.loopStyle[this.loopIndex]
@@ -88,29 +103,113 @@ export default {
     audioPlay() {
       this[BOOL_PAUSE](true)
     },
-    // 控制声音
+    // 控制音量控件的显示隐藏
     voiceCtrl() {
-      console.log(this.$refs.audio.volume)
+      if (window.getComputedStyle(this.$refs.volume).display === 'none') {
+        this.$refs.volume.style.display = 'block'
+      } else {
+        this.$refs.volume.style.display = 'none'
+      }
+    },
+    // 添加一个全局window的点击事件,如果window被点击时volume是显示状态,那么将会被隐藏
+    volumeWindowEvent() {
+      let that = this
+      window.addEventListener('click', function() {
+        if (that.$refs.volume.style.display && that.$refs.volume.style.display === 'block') {
+          that.$refs.volume.style.display = 'none'
+        }
+      })
+    },
+    // 静音
+    shutVolume() {
+      this.$refs.audio.muted = !this.$refs.audio.muted
+      this[CHANGE_MUTED](this.$refs.audio.muted)
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.audio {
-  position: absolute;
-  top: -200px;
-}
+// .audio {
+//   position: absolute;
+//   top: -200px;
+// }
 #wrap {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
   width: 220px;
   height: 67px;
-  .loop,
-  .voice {
+  .loop {
     span {
       font-size: 16px;
+    }
+  }
+  .img-gray {
+    color: #c4c4c4;
+  }
+  .voice {
+    position: relative;
+    span {
+      font-size: 16px;
+    }
+    .volume {
+      display: none;
+      transform-style: preserve-3d;
+      position: absolute;
+      left: -30px;
+      top: -260px;
+      width: 71px;
+      height: 238px;
+      border-radius: 7px;
+      background: #fff;
+      &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        left: 28px;
+        bottom: -8px;
+        width: 16px;
+        height: 16px;
+        background: #fff;
+        transform: rotateZ(45deg) translateZ(-1px);
+        box-shadow: 1px 1px 5px var(--green);
+      }
+    }
+    .volume-base {
+      position: relative;
+      width: 3px;
+      height: 125px;
+      margin: 22px auto 0;
+      background: #ececec;
+      .base-scroll {
+        position: absolute;
+        bottom: 0;
+        width: 3px;
+        height: 50px;
+        background: var(--green);
+      }
+      .base-circle {
+        position: absolute;
+        left: -5px;
+        bottom: 37px;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+    }
+
+    .volume-level {
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+    }
+    .volume-img {
+      text-align: center;
+      font-size: 18px;
+      color: var(--green);
+      line-height: 48px;
     }
   }
   .pre,

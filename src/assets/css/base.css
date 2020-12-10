@@ -90,3 +90,7 @@ a {
   bottom: 0;
   margin: auto;
 }
+
+li {
+  list-style: none;
+}

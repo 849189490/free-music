@@ -5,6 +5,7 @@ import {
   BOOL_PAUSE,
   CHANGE_CURRENT_TIME,
   CHANGE_DURATION_TIME,
+  CHANGE_MUTED,
 } from './consts'
 const mutations = {
   // 改变列表选中状态
@@ -30,6 +31,10 @@ const mutations = {
   // 改变歌曲总时间, 切歌时记录
   [CHANGE_DURATION_TIME](state, payload) {
     state.duration = payload
+  },
+  // 切换是否静音
+  [CHANGE_MUTED](state, payload) {
+    state.muted = payload
   },
 }
 export default mutations

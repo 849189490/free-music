@@ -12,11 +12,20 @@
 
 <script>
 import { getRootOffset } from 'common/utils'
-import { CHANGE_CURRENT_TIME } from 'store/consts'
-import { mapState, mapMutations } from 'vuex'
+import { mixCtrlStore } from 'common/mixin'
+import {
+  CHANGE_LIST_CHECKED,
+  CHANGE_LOOP_INDEX,
+  CHANG_EPAUSE,
+  BOOL_PAUSE,
+  CHANGE_CURRENT_TIME,
+  CHANGE_DURATION_TIME,
+  CHANGE_MUTED,
+} from 'store/consts.js'
+
 export default {
   name: 'MusicCtrl',
-
+  mixins: [mixCtrlStore],
   data() {
     return {
       percent: 0, // 当前播放的比率
@@ -27,12 +36,10 @@ export default {
   mounted() {
     this.dragProgress()
   },
-  computed: {
-    ...mapState(['currentTime', 'duration']),
-  },
 
   watch: {
     currentTime(val) {
+      // 播放到100%时
       if (this.percent === 1) {
         if (this.loopIndex === 0) {
           // 播放下一曲
@@ -50,7 +57,6 @@ export default {
     },
   },
   methods: {
-    ...mapMutations([CHANGE_CURRENT_TIME]),
     // 点击进度条时改变播放进度
     ctrlParentChange(e) {
       // 使用dataset来保证控制的是含有data-parent的ctrlParent
@@ -58,7 +64,7 @@ export default {
       let size = parseInt(window.getComputedStyle(target).width)
       // 获取data-parent到window的距离getRootOffset(target)
       // moveSize代表播放进度条要移动到的距离
-      this.moveSize = e.pageX - getRootOffset(target)
+      this.moveSize = e.pageX - getRootOffset(target).x
       let finalChange = (this.moveSize / size) * this.duration
       this[CHANGE_CURRENT_TIME](finalChange)
       this.$emit('change-current-time', finalChange)

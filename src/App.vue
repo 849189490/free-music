@@ -58,7 +58,7 @@ export default {
     }
     .middle-content {
       width: 936px;
-      height: 640px;
+      height: 646px;
     }
   }
 }

@@ -32,7 +32,7 @@ export default {
     background-size: 24px 24px;
   }
   .wrap-scroll {
-    height: 696px;
+    height: 695px;
     overflow-x: hidden;
     overflow-y: auto;
   }
