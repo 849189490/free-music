@@ -1,13 +1,5 @@
 // 公共方法
-// 缓存
-export const localKeep = {
-  get(id) {
-    return JSON.parse(localStorage.get(id))
-  },
-  set(id, val) {
-    localStorage.setItem(id, JSON.stringify(val))
-  },
-}
+
 // 节流
 export function throttle(fn, interval) {
   let last = 0 // last为上一次触发回调的时间
@@ -35,3 +27,5 @@ export function getRootOffset(ele) {
   }
   return { x, y }
 }
+
+// 时间过滤

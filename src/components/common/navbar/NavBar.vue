@@ -14,6 +14,15 @@
 </template>
 
 <script>
+/*
+ * @description : 导航的间距
+ * @prop { Number } : size
+ *
+ * @description : 导航栏文字
+ * @prop { Array } : clist
+ *
+ */
+
 export default {
   name: 'NavBar',
   props: {

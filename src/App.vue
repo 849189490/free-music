@@ -44,6 +44,7 @@ export default {
   width: 1136px;
   height: 778px;
   margin: 50px auto;
+  background: #f0f0f0;
   .left-ctrl {
     width: 200px;
   }

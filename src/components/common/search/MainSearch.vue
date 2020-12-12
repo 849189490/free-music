@@ -5,6 +5,7 @@
       <input
         @blur="deactiveBtn"
         @focus="activeBtn"
+        @keyup.enter="searchSongs"
         class="iconfont icon-search"
         type="text"
         v-model="inpVal"
@@ -43,6 +44,13 @@ export default {
     },
     searchSongs() {
       this.inpVal && this[ASYNC_SEARCH_SONGS](this.inpVal)
+      // 当前的路径中是否含有/songs,如果有就不需要跳转,直接改变数据即可
+      let curRoute = this.$route.fullPath.indexOf('/songs') === -1
+      if (curRoute) {
+        this.$router.push(`/songs/${this.inpVal}`)
+      } else {
+        this.$router.replace(`/songs/${this.inpVal}`)
+      }
     },
   },
 }

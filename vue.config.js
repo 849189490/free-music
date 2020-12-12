@@ -6,6 +6,7 @@ module.exports = {
         assets: '@/assets',
         common: '@/common',
         components: '@/components',
+        local: '@/local',
         network: '@/network',
         router: '@/router',
         store: '@/store',

@@ -31,12 +31,13 @@ export default {
       percent: 0, // 当前播放的比率
       startX: 0, // 记录小圆圈到window的距离
       moveSize: 0, // 拖动距离
+      maxSize: 0, // 记录小圆圈的可移动距离
     }
   },
   mounted() {
+    this.maxSize = parseInt(window.getComputedStyle(this.$refs.current.parentNode).width) - 9
     this.dragProgress()
   },
-
   watch: {
     currentTime(val) {
       // 播放到100%时
@@ -51,8 +52,7 @@ export default {
       } else {
         this.percent = this.currentTime / this.duration
         // 歌曲进度条的变化
-        this.$refs.ctrl.style.left = this.$refs.current.style.width =
-          parseInt(window.getComputedStyle(this.$refs.current.parentNode).width) * this.percent + 'px'
+        this.$refs.ctrl.style.left = this.$refs.current.style.width = this.maxSize * this.percent + 'px'
       }
     },
   },
@@ -61,7 +61,8 @@ export default {
     ctrlParentChange(e) {
       // 使用dataset来保证控制的是含有data-parent的ctrlParent
       let target = e.target.dataset.father ? e.target : e.target.parentNode
-      let size = parseInt(window.getComputedStyle(target).width)
+      // 减9是去掉小圆圈的宽度,避免超出
+      let size = parseInt(window.getComputedStyle(target).width) - 9
       // 获取data-parent到window的距离getRootOffset(target)
       // moveSize代表播放进度条要移动到的距离
       this.moveSize = e.pageX - getRootOffset(target).x
@@ -72,8 +73,6 @@ export default {
     // 拖动进度条的事件
     dragProgress() {
       let that = this
-      // 记录控件父级的高度
-      let parent = parseInt(window.getComputedStyle(that.$refs.ctrlParent).width)
       this.$refs.ctrl.addEventListener('mousedown', function(e) {
         that.startX = e.pageX - this.offsetLeft
         document.onmousemove = function(e) {
@@ -82,14 +81,14 @@ export default {
           if (e.pageX - that.startX < 0) {
             that.moveSize = 0
           }
-          if (e.pageX - that.startX > parent) {
-            that.moveSize = parent
+          if (e.pageX - that.startX > that.maxSize) {
+            that.moveSize = that.maxSize
           }
           // 改变控件的大小和位置
           that.$refs.current.style.width = that.$refs.ctrl.style.left = that.moveSize + 'px'
           document.onmouseup = function() {
             // 改变vuex音乐的播放进度
-            let val = (that.moveSize / parent) * that.duration
+            let val = (that.moveSize / that.maxSize) * that.duration
             that[CHANGE_CURRENT_TIME](val)
             that.$emit('change-current-time', val)
             // 移除事件

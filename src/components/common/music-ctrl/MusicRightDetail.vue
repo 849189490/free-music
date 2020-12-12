@@ -1,20 +1,34 @@
 <template>
   <section id="wrap">
     <div class="wrap-time">
-      <span>00:24</span>
+      <span>{{ currentTime | timeFilter }}</span>
       <span> / </span>
-      <span>03:33</span>
+      <span>{{ duration | timeFilter }}</span>
       <span> 词</span>
     </div>
-    <div class="wrap-list iconfont icon-list">96</div>
+    <div class="wrap-list iconfont icon-list">{{ readyToPlay.length }}</div>
   </section>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'MusicRightDetail',
   data() {
     return {}
+  },
+  computed: {
+    ...mapState(['currentTime', 'duration', 'readyToPlay']),
+  },
+  filters: {
+    timeFilter(val) {
+      val = parseInt(val)
+      let second = parseInt(val % 60)
+      second = second > 9 ? second : '0' + second
+      let minute = parseInt(val / 60)
+      minute = minute > 9 ? minute : '0' + minute
+      return minute + ' : ' + second
+    },
   },
 }
 </script>

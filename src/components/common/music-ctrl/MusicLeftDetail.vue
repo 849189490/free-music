@@ -1,16 +1,21 @@
 <template>
   <section id="wrap">
     <div class="pic">
-      <img src="~assets/img/bird.jpg" alt="" />
+      <img :src="nowSong.img" alt="" />
     </div>
     <div class="detail">
       <div class="detail-top">
-        <span class="top-title">旧城之王</span>
-        <span class="top-author"> - 木马</span>
+        <span class="top-title">{{ nowSong.name }}</span>
+        <span class="top-author"> - {{ nowSong.fullArtists }}</span>
       </div>
       <div class="detail-bottom">
-        <span class="iconfont icon-collect"></span>
-        <span class="iconfont icon-dowmload"></span>
+        <span  :data-collect="nowSong.id" :class="{'red': nowSong.collect}" class="iconfont icon-collect"></span>
+        <a
+          target="_blank"
+          class="iconfont icon-dowmload"
+          :href="nowSong.url"
+          :download="nowSong.name + '-' + nowSong.fullArtists"
+        ></a>
         <span class="iconfont icon-more"></span>
       </div>
     </div>
@@ -18,11 +23,24 @@
 </template>
 
 <script>
+import { mixCtrlStore } from 'common/mixin'
+import {
+  CHANGE_LIST_CHECKED,
+  CHANGE_LOOP_INDEX,
+  CHANG_EPAUSE,
+  BOOL_PAUSE,
+  CHANGE_CURRENT_TIME,
+  CHANGE_DURATION_TIME,
+  CHANGE_MUTED,
+  CAN_I_LISTEN_MY_SONG,
+} from 'store/consts'
 export default {
   name: 'MusicLeftDetail',
   data() {
     return {}
   },
+  mixins: [mixCtrlStore],
+  filters: {},
 }
 </script>
 
@@ -61,7 +79,11 @@ export default {
       display: flex;
       line-height: 20px;
       font-size: 16px;
-      span {
+      .red {
+        color: #f00;
+      }
+      span,
+      a {
         margin: 0 8px;
       }
     }

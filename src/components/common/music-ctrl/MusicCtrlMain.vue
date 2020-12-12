@@ -1,6 +1,6 @@
 <template>
   <section id="wrap">
-    <audio @pause="audioPause" @play="audioPlay" class="audio" ref="audio" :src="nowSong.url"></audio>
+    <audio loop @pause="audioPause" @play="audioPlay" class="audio" ref="audio" :src="nowSong.url"></audio>
     <div class="loop" @click.stop="changeLoop">
       <span class="iconfont" :class="loopCheck"></span>
     </div>
@@ -41,6 +41,7 @@ import {
   CHANGE_CURRENT_TIME,
   CHANGE_DURATION_TIME,
   CHANGE_MUTED,
+  CAN_I_LISTEN_MY_SONG,
 } from 'store/consts'
 export default {
   name: 'MusicCtrlItem',
@@ -67,13 +68,6 @@ export default {
     cneedToChange(val) {
       this.$refs.audio.currentTime = val
     },
-    // isPause(val) {
-    //   if (!this.isPause) {
-    //     this.$refs.audio.pause()
-    //   } else {
-    //     this.$refs.audio.play()
-    //   }
-    // },
   },
   methods: {
     changeLoop() {
@@ -134,9 +128,12 @@ export default {
     cutMySong() {
       let that = this
       this.$refs.audio.addEventListener('canplay', function() {
-        console.log('canplay')
-        this.play()
-        that[BOOL_PAUSE](true)
+        if (that.canIListenMySong) {
+          this.play()
+          that[BOOL_PAUSE](true)
+        } else {
+          that[CAN_I_LISTEN_MY_SONG]()
+        }
       })
     },
   },
